@@ -2,47 +2,54 @@ import { useState, useEffect } from "react";
 import QuadroContext from "./QuadroContext";
 import {
     getQuadrosAPI, getQuadroPorCodigoAPI,
-    deleteQuadroAPI, cadastraQuadroAPI
+    deleteQuadroAPI, cadastrarQuadroAPI
 } from "../../../servicos/QuadroServico";
 import Tabela from "./Tabela";
 import Form from "./Form";
 import Carregando from "../../comuns/Carregando";
+import WithAuth from "../../../seguranca/WithAuth";
+import { useNavigate } from 'react-router-dom';
 
 function Quadro() {
+
+    let navigate = useNavigate();
 
     const [alerta, setAlerta] = useState({ status: "", message: "" });
     const [listaObjetos, setListaObjetos] = useState([]);
     const [editar, setEditar] = useState(false);
-    const [objeto, setObjeto] = useState({ codigo: "", nome: "" , autor: "" });
+    const [objeto, setObjeto] = useState({ codigo: "", nome: "" });
+    const [carregando, setCarregando] = useState(true);
 
     const novoObjeto = () => {
         setEditar(false);
         setAlerta({ status: "", message: "" });
-        setObjeto({
-            codigo: 0,
-            nome: "",
-            autor: ""
-        });
+        setObjeto({ codigo: 0, nome: "" , autor: "" });
     }
 
     const editarObjeto = async codigo => {
-        setObjeto(await getQuadroPorCodigoAPI(codigo));
-        setEditar(true);
-        setAlerta({ status: "", message: "" });
+        try {
+            setObjeto(await getQuadroPorCodigoAPI(codigo));
+            setEditar(true);
+            setAlerta({ status: "", message: "" });
+        } catch (err) {
+            window.location.reload();
+            navigate("/login", { replace: true });
+        }
     }
 
     const acaoCadastrar = async e => {
         e.preventDefault();
-        const metodo = editar ? "PUT" : "POST";
+        let metodo = editar ? "PUT" : "POST";
         try {
-            let retornoAPI = await cadastraQuadroAPI(objeto, metodo);
+            let retornoAPI = await cadastrarQuadroAPI(metodo, objeto);
             setAlerta({ status: retornoAPI.status, message: retornoAPI.message });
             setObjeto(retornoAPI.objeto);
             if (!editar) {
                 setEditar(true);
             }
         } catch (err) {
-            console.log(err);
+            window.location.reload();
+            navigate("/login", { replace: true });
         }
         recuperaQuadros();
     }
@@ -53,19 +60,27 @@ function Quadro() {
         setObjeto({ ...objeto, [name]: value });
     }
 
-    const [carregando, setCarregando] = useState(false);
-
     const recuperaQuadros = async () => {
-        setCarregando(true);
-        setListaObjetos(await getQuadrosAPI());
-        setCarregando(false);
+        try {
+            setCarregando(true);
+            setListaObjetos(await getQuadrosAPI());
+            setCarregando(false);
+        } catch (err) {
+            window.location.reload();
+            navigate("/login", { replace: true });
+        }
     }
 
     const remover = async codigo => {
         if (window.confirm('Deseja remover este objeto?')) {
-            let retornoAPI = await deleteQuadroAPI(codigo);
-            setAlerta({ status: retornoAPI.status, message: retornoAPI.message });
-            recuperaQuadros();
+            try {
+                let retornoAPI = await deleteQuadroAPI(codigo);
+                setAlerta({ status: retornoAPI.status, message: retornoAPI.message });
+                recuperaQuadros();
+            } catch (err) {
+                window.location.reload();
+                navigate("/login", { replace: true });
+            }
         }
     }
 
@@ -73,20 +88,20 @@ function Quadro() {
         recuperaQuadros();
     }, []);
 
+
     return (
         <QuadroContext.Provider value={{
             alerta, listaObjetos, remover,
-            objeto, acaoCadastrar, handleChange, novoObjeto, editarObjeto
+            objeto, editar, acaoCadastrar, handleChange, novoObjeto, editarObjeto
         }}>
             <Carregando carregando={carregando}>
                 <Tabela />
             </Carregando>
             <Form />
+
         </QuadroContext.Provider>
     )
-
-
-
 }
 
-export default Quadro;
+// import WithAuth from "../../../seguranca/WithAuth";
+export default WithAuth(Quadro);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 const Alerta = ({ alerta }) => {
 
@@ -12,10 +12,10 @@ const Alerta = ({ alerta }) => {
     }, [alerta]);
 
     let classe = '';
-    if (alerta.status === 'error') {
-        classe = 'alert alert-danger';
+    if (alerta.status === "error") {
+        classe = "alert alert-danger";
     } else {
-        classe = 'alert alert-primary';
+        classe = "alert alert-primary";
     }
 
     return (
@@ -28,7 +28,6 @@ const Alerta = ({ alerta }) => {
             }
         </>
     )
-
-}
+} 
 
 export default Alerta;

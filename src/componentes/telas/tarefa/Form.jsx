@@ -1,66 +1,152 @@
 import { useContext } from "react";
-import TarefaContext from "./TarefaContext";
 import Alerta from "../../comuns/Alerta";
-import CampoEntrada from "../../comuns/CampoEntrada";
-import Dialogo from "../../comuns/Dialogo";
-import CampoSelect from "../../comuns/CampoSelect";
+import TarefaContext from "./TarefaContext";
 
 function Form() {
 
     const { objeto, handleChange, acaoCadastrar, alerta, listaQuadros }
         = useContext(TarefaContext);
 
-    if(!objeto) return null;
-    
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (() => {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
 
     return (
-        <Dialogo id="modalEdicao" titulo="Produto"
-            idform="formulario" acaoCadastrar={acaoCadastrar}>
-            <Alerta alerta={alerta} />
-            {/* <CampoEntrada id="txtCodigo" label="Código" tipo="number"
-                placeholder="" requerido="false"
-                name="codigo" value={objeto.codigo} onchange={handleChange}
-                msgvalido="" msginvalido=""
-                readonly={true} /> */}
-            <CampoEntrada id="txtTitulo" label="Titulo" tipo="text"
-                placeholder="Informe o titulo" requerido="true"
-                name="titulo" value={objeto.titulo} onchange={handleChange}
-                msgvalido="Campo titulo OK" msginvalido="Informe o titulo"
-                readonly={false} />
-            <CampoEntrada id="txtDescricao" label="Descrição" tipo="text"
-                placeholder="Informe a descrição" requerido="true"
-                name="descricao" value={objeto.descricao} onchange={handleChange}
-                msgvalido="Campo descrição OK" msginvalido="Informe a descrição"
-                readonly={false} />
-            <CampoSelect id="selectPrioridade" label="Prioridade"
-                requerido="true"
-                name="prioridade" value={objeto.prioridade}
-                onchange={handleChange}
-                msgvalido="Campo prioridade OK" msginvalido="Informe a prioridade"
-                readonly={false}>
-                <option value="Alta">Alta</option>
-                <option value="Média">Média</option>
-                <option value="Baixa">Baixa</option>
-            </CampoSelect>
-            <CampoEntrada id="txtData" label="Data de criação" tipo="date"
-                placeholder="Informe a data de criação" requerido="true"
-                name="data_criacao" value={objeto.data_criacao}
-                onchange={handleChange}
-                msgvalido="Campo data de criação OK" msginvalido="Informe a data de criação"
-                readonly={false} />
-            <CampoSelect id="selectQuadro" label="Quadro"
-                requerido="true"
-                name="quadro" value={objeto.quadro}
-                onchange={handleChange}
-                msgvalido="Campo Quadro OK" msginvalido="Informe o quadro"
-                readonly={false}>
-                {
-                    listaQuadros.map((quadro) => (
-                        <option value={quadro.codigo} key={quadro.codigo}>{quadro.nome}</option>
-                    ))
-                }
-            </CampoSelect>
-        </Dialogo>
+        <div className="modal fade" id="modalEdicao"
+            tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div className="modal-dialog">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h1 className="modal-title fs-5"
+                            id="exampleModalLabel">Edição de Produtos</h1>
+                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="formulario" onSubmit={acaoCadastrar}
+                        className="needs-validation" noValidate>
+                        <div className="modal-body">
+                            <Alerta alerta={alerta} />
+                            {/* <div className="mb-3">
+                                <label htmlFor="txtCodigo" className="form-label">Código</label>
+                                <input type="number" className="form-control" id="txtCodigo"
+                                    readOnly name="codigo" value={objeto.codigo} onChange={handleChange} />
+                            </div> */}
+                            <div className="mb-3">
+                                <label htmlFor="txtTitulo" className="form-label">Titulo</label>
+                                <input type="text" className="form-control"
+                                    id="txtTitulo" placeholder="Informe o titulo"
+                                    required name="titulo" value={objeto.titulo}
+                                    onChange={handleChange} />
+                                <div className="valid-feedback">
+                                    Titulo OK!
+                                </div>
+                                <div className="invalid-feedback">
+                                    Informe o titulo!
+                                </div>
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="txtDescricao"
+                                    className="form-label">Descrição</label>
+                                <input type="text" className="form-control"
+                                    id="txtDescricao" placeholder="Informe a descrição"
+                                    required name="descricao" value={objeto.descricao}
+                                    onChange={handleChange} />
+                                <div className="valid-feedback">
+                                    Descrição OK!
+                                </div>
+                                <div className="invalid-feedback">
+                                    Informe a descrição!
+                                </div>
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="selectPrioridade"
+                                    className="form-label">Prioridade</label>
+                                <select className="form-control"
+                                    id="selectPrioridade"
+                                    required name="prioridade"
+                                    value={objeto.prioridade}
+                                    onChange={handleChange} >
+                                    <option disabled="true" value="">Selecione a prioridade</option>
+                                    <option value="Alta">Alta</option>
+                                    <option value="Média">Média</option>
+                                    <option value="Baixa">Baixa</option>
+                                </select>
+                                <div className="valid-feedback">
+                                    Prioridade OK!
+                                </div>
+                                <div className="invalid-feedback">
+                                    Selecione a prioridade!
+                                </div>
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="txtDataCriacao"
+                                    className="form-label">Data de Criacao</label>
+                                <input type="date" className="form-control"
+                                    id="txtDataCriacao"
+                                    required name="data_criacao"
+                                    value={objeto.data_criacao}
+                                    onChange={handleChange} />
+                                <div className="valid-feedback">
+                                    Data de criação OK!
+                                </div>
+                                <div className="invalid-feedback">
+                                    Informe a data de criação!
+                                </div>
+                            </div>
+
+                            <div className="mb-3">
+                                <label htmlFor="selectQuadro"
+                                    className="form-label">Quadro</label>
+                                <select type="text" className="form-control"
+                                    id="selectQuadro"
+                                    required name="quadro" value={objeto.quadro}
+                                    onChange={handleChange} >
+                                    <option disabled="true" value="">Selecione o quadro</option>
+                                    {
+                                        listaQuadros.map((quadro) => (
+                                            <option key={quadro.codigo}
+                                                value={quadro.codigo}>
+                                                {quadro.nome}
+                                            </option>
+                                        ))
+                                    }
+                                </select>
+                                <div className="valid-feedback">
+                                    Quadro OK!
+                                </div>
+                                <div className="invalid-feedback">
+                                    Selecione o quadro
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary"
+                                data-bs-dismiss="modal">Fechar</button>
+                            <button type="submit"
+                                className="btn btn-success">
+                                Salvar
+                                <i className="bi bi-save"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     )
 }
 
